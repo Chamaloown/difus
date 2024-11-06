@@ -54,11 +54,11 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 
 		switch {
 		case strings.Contains(message.Content, "!author"):
-			discord.ChannelMessageSend(message.Content, "Malo Landemaine")
+			discord.ChannelMessageSend(message.ChannelID, "Malo Landemaine")
 		case strings.Contains(message.Content, "!help"):
-			discord.ChannelMessageSend("314480237817626624", "Hello World😃")
+			discord.ChannelMessageSend(message.ChannelID, "Hello World😃")
 		case strings.Contains(message.Content, "!bye"):
-			discord.ChannelMessageSend("314480237817626624", "Good Bye👋")
+			discord.ChannelMessageSend(message.ChannelID, "Good Bye👋")
 		default:
 		}
 	}
