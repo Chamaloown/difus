@@ -13,36 +13,25 @@ import (
 
 var BotToken string
 
-func checkNilErr(e error) {
- if e != nil {
-  log.Fatal("Error message")
- }
-}
-
 func Run() {
+	discord, err := discordgo.New("Bot " + BotToken)
 
- // create a session
- discord, err := discordgo.New("Bot " + BotToken)
- checkNilErr(err)
+	if err != nil {
+		log.Fatal(err)
+	}
 
- go almanax.Run()
+	discord.AddHandler(newMessage)
 
- // add a event handler
- discord.AddHandler(newMessage)
+	discord.Open()
+	
+	go almanax.Run(discord)
 
- // Cronjob
+	defer discord.Close()
 
-
- // open session
- discord.Open()
- defer discord.Close() // close session, after function termination
-
- // keep bot running untill there is NO os interruption (ctrl + C)
- fmt.Println("Bot running....")
- c := make(chan os.Signal, 1)
- signal.Notify(c, os.Interrupt)
- <-c
-
+	fmt.Println("Bot running....")
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	<-c
 }
 
 func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
@@ -59,6 +48,8 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 			discord.ChannelMessageSend(message.ChannelID, "Hello World😃")
 		case strings.Contains(message.Content, "!bye"):
 			discord.ChannelMessageSend(message.ChannelID, "Good Bye👋")
+		case strings.Contains(message.Content, "!alma"):
+			discord.ChannelMessageSend(message.ChannelID, "Almanax")
 		default:
 		}
 	}
