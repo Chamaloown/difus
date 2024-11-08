@@ -39,18 +39,28 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
   		return
 	}
 
-	if message.ChannelID == os.Getenv("CHANNEL_ID") {
-
-		switch {
+	switch {
 		case strings.Contains(message.Content, "!author"):
 			discord.ChannelMessageSend(message.ChannelID, "Malo Landemaine")
 		case strings.Contains(message.Content, "!help"):
-			discord.ChannelMessageSend(message.ChannelID, "Hello World😃")
-		case strings.Contains(message.Content, "!bye"):
-			discord.ChannelMessageSend(message.ChannelID, "Good Bye👋")
-		case strings.Contains(message.Content, "!alma"):
-			discord.ChannelMessageSend(message.ChannelID, "Almanax")
+			discord.ChannelMessageSend(message.ChannelID, help())
+		case strings.Contains(message.Content, "!alma"): 
+			var msg = almanax.GetAlmanax(message.Content)
+			discord.ChannelMessageSendComplex(message.ChannelID, &msg)
 		default:
-		}
 	}
 }
+
+func help() string {
+	return `Voici les commandes disponibles :
+
+	📜 **!author** - Affiche le nom de l'auteur.
+	❓ **!help** - Affiche ce message d'aide.
+	📅 **!alma [today | week | JJ/MM/AAAA]** - Récupère l'Almanax pour un jour spécifique :
+	      •  **today** : Affiche l'Almanax d'aujourd'hui.
+	      •  **week** : Affiche l'Almanax pour toute la semaine.
+	      •  **JJ/MM/AAAA** : Affiche l'Almanax pour une date spécifique (ex. 08/11/2024).
+	
+	Veuillez utiliser le bon format de date ou les mots-clés spécifiés pour chaque option.`
+
+	}

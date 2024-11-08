@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 
 	bot "github.com/chamaloown/difus/Bot"
@@ -11,7 +11,7 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Println("Error!")
+		log.Fatal(err)
 	}
 
 	bot.BotToken = os.Getenv("BOT_TOKEN")

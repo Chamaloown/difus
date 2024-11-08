@@ -18,10 +18,8 @@ var (
 	dbOnce     sync.Once
 )
 
-// daysInAYear constant
 const daysInAYear = 365
 
-// Almanax struct
 type Almanax struct {
 	Id              int
 	Date            time.Time
@@ -33,7 +31,6 @@ type Almanax struct {
 	Kamas           int
 }
 
-// getDBInstance returns a singleton instance of the database connection
 func GetDBInstance() *sql.DB {
 	dbOnce.Do(func() {
 		fmt.Println("Initializing database connection...")
@@ -62,17 +59,15 @@ func GetDBInstance() *sql.DB {
 	return dbInstance
 }
 
-// isAlreadyCharged checks if the database already has the required data
 func isAlreadyCharged(db *sql.DB) bool {
 	var count int
 	err := db.QueryRow(`SELECT COUNT(*) FROM almanax.almanaxes`).Scan(&count)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return count == daysInAYear
+	return count == daysInAYear + 54 // + 54 because we start from 08/11/2024
 }
 
-// Setup initializes the database if not already populated
 func Setup() {
 	db := GetDBInstance()
 
@@ -140,7 +135,6 @@ func Setup() {
 	fmt.Println("Successfully charged the database!")
 }
 
-// createAlmanax inserts a new Almanax entry into the database
 func createAlmanax(db *sql.DB, almanax Almanax) (int, error) {
 	var id int
 	err := db.QueryRow("INSERT INTO almanax.almanaxes(date, merydes, type, bonus, offerings, quantity_offered, kamas) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id",
@@ -151,8 +145,7 @@ func createAlmanax(db *sql.DB, almanax Almanax) (int, error) {
 	return id, nil
 }
 
-// readAlmanaxes retrieves Almanax entries from the database
-func readAlmanaxes(db *sql.DB) ([]Almanax, error) {
+func ReadAlmanaxes(db *sql.DB) ([]Almanax, error) {
 	rows, err := db.Query("SELECT id, date, merydes, type, bonus, offerings, quantity_offered, kamas FROM almanax.almanaxes")
 	if err != nil {
 		return nil, err
@@ -171,7 +164,6 @@ func readAlmanaxes(db *sql.DB) ([]Almanax, error) {
 }
 
 
-// GetAlmanax retrieves a specific Almanax entries from the database
 func GetAlmanax(db *sql.DB, date time.Time) (Almanax, error) {
 	var a Almanax
 	err := db.QueryRow("SELECT id, date, merydes, type, bonus, offerings, quantity_offered, kamas FROM almanax.almanaxes WHERE date = $1", date).Scan(&a.Id, &a.Date, &a.Merydes, &a.Type, &a.Bonus, &a.Offerings, &a.QuantityOffered, &a.Kamas)
@@ -180,4 +172,54 @@ func GetAlmanax(db *sql.DB, date time.Time) (Almanax, error) {
 		log.Fatal(err)
 	}
 	return a, nil
+}
+
+func GetAlmanaxesInRange(db *sql.DB, start time.Time, end time.Time) ([]Almanax, error) {
+	rows, err := db.Query("SELECT id, date, merydes, type, bonus, offerings, quantity_offered, kamas FROM almanax.almanaxes WHERE date >= $1 AND date <= $2", start, end)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var almanaxes []Almanax
+	for rows.Next() {
+		var r Almanax
+		if err := rows.Scan(&r.Id, &r.Date, &r.Merydes, &r.Type, &r.Bonus, &r.Offerings, &r.QuantityOffered, &r.Kamas); err != nil {
+			return nil, err
+		}
+		almanaxes = append(almanaxes, r)
+	}
+	return almanaxes, nil
+}
+
+
+func weekStart(year, week int) time.Time {
+    t := time.Date(year, 7, 1, 0, 0, 0, 0, time.UTC)
+
+    if wd := t.Weekday(); wd == time.Sunday {
+        t = t.AddDate(0, 0, -6)
+    } else {
+        t = t.AddDate(0, 0, -int(wd)+1)
+    }
+
+    _, w := t.ISOWeek()
+    t = t.AddDate(0, 0, (week-w)*7)
+
+    return t
+}
+
+func weekRange(year, week int) (start, end time.Time) {
+    start = weekStart(year, week)
+    end = start.AddDate(0, 0, 6)
+    return
+}
+
+func GetWeeklyAlmanax(db *sql.DB) ([]Almanax, error) {
+	year, month := time.Now().ISOWeek()
+	start, end := weekRange(year, month)
+	alamanax, err := GetAlmanaxesInRange(db, start, end)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return alamanax, nil
 }
