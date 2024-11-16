@@ -86,7 +86,7 @@ func Run(discord *discordgo.Session) {
 		gocron.DailyJob(
 			1,
 			gocron.NewAtTimes(
-				gocron.NewAtTime(0, 36, 0),
+				gocron.NewAtTime(0, 30, 0),
 				gocron.NewAtTime(22, 0, 0),
 			),
 		),
