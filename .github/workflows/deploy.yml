@@ -21,7 +21,7 @@ jobs:
       - name: Display Build Golang App
         run: ls -R build/
       - name: Create Env File
-        run: 'echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}\nCHANNEL_ID=${{ secrets.CHANNEL_ID }}\nDB_USER=${{ secrets.DB_USER }}\nDB_PASSWORD=${{ secrets.DB_PASSWORD }}\nDB_HOST=${{ secrets.DB_HOST }}\nDB_PORT=${{ secrets.DB_PORT }}\nDB_NAME=${{ secrets.DB_NAME }}\nDB_SSL=${{ secrets.DB_SSL }}\n" > build/.env'
+        run: 'echo -e "BOT_TOKEN=${{ secrets.BOT_TOKEN }}\nCHANNEL_ID=${{ secrets.CHANNEL_ID }}\nDB_USER=${{ secrets.DB_USER }}\nDB_PASSWORD=${{ secrets.DB_PASSWORD }}\nDB_HOST=${{ secrets.DB_HOST }}\nDB_PORT=${{ secrets.DB_PORT }}\nDB_NAME=${{ secrets.DB_NAME }}\nDB_SSL=${{ secrets.DB_SSL }}\n" > build/.env.test'
       - name: Display Env file
         run: "cat build/.env"
       - name: Run Unit Test Golang App
@@ -35,13 +35,13 @@ jobs:
           port: "${{ secrets.VM_SSH_PORT }}"
           source: .
           target: /home/debian/difus
-      - name: Deploy Build Golang App To Debian VM
-        uses: appleboy/scp-action@master
-        with:
-          host: "${{ secrets.VM_HOST }}"
-          username: "${{ secrets.VM_USERNAME }}"
-          key: "${{ secrets.VM_SSH_KEY }}"
-          port: "${{ secrets.VM_SSH_PORT }}"
-          # script: |
-          #   cd /home/debian/difus/build
-          #   ls -l
+      # - name: Deploy Build Golang App To Debian VM
+      #   uses: appleboy/scp-action@master
+      #   with:
+      #     host: "${{ secrets.VM_HOST }}"
+      #     username: "${{ secrets.VM_USERNAME }}"
+      #     key: "${{ secrets.VM_SSH_KEY }}"
+      #     port: "${{ secrets.VM_SSH_PORT }}"
+      #     # script: |
+      #     #   cd /home/debian/difus/build
+      #     #   ls -l
