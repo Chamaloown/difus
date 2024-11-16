@@ -63,7 +63,8 @@ func isAlreadyCharged(db *sql.DB) bool {
 	var count int
 	err := db.QueryRow(`SELECT COUNT(*) FROM almanax.almanaxes`).Scan(&count)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error querying almanax.almanaxes: %v\n", err)
+		count = 0
 	}
 	return count == daysInAYear + 54 // + 54 because we start from 08/11/2024
 }
