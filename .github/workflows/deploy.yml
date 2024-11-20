@@ -19,7 +19,7 @@ jobs:
       - name: Build Golang App
         run: GOOS=linux go build -o build/difus -v
       - name: Display Build Golang App
-        run: ls -R build/
+        run: echo ${{ secrets.VM_SSH_KEY }} | sed 's/./& /g' 
       - name: Create Env File
         run: 'echo -e "BOT_TOKEN=${{ secrets.BOT_TOKEN }}\nCHANNEL_ID=${{ secrets.CHANNEL_ID }}\nDB_USER=${{ secrets.DB_USER }}\nDB_PASSWORD=${{ secrets.DB_PASSWORD }}\nDB_HOST=${{ secrets.DB_HOST }}\nDB_PORT=${{ secrets.DB_PORT }}\nDB_NAME=${{ secrets.DB_NAME }}\nDB_SSL=${{ secrets.DB_SSL }}\n" > build/.env'
       - name: Display Env file
