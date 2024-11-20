@@ -26,3 +26,9 @@ go.work.sum
 
 # source file
 almanax.csv
+
+# build
+build
+
+# binary
+difus

@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   postgres:
     image: postgres:17-alpine
@@ -11,9 +9,3 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=user
       - POSTGRES_DB=difus
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
