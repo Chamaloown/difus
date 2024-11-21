@@ -43,6 +43,6 @@ jobs:
           key: "${{ secrets.VM_SSH_KEY }}"
           port: "${{ secrets.VM_SSH_PORT }}"
           script: |
-            cd /home/debian/difus/
+            cd /home/debian/difus/build
             ./difus &
 
