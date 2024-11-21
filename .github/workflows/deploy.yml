@@ -33,7 +33,7 @@ jobs:
           username: "${{ secrets.VM_USERNAME }}"
           key: "${{ secrets.VM_SSH_KEY }}"
           port: "${{ secrets.VM_SSH_PORT }}"
-          source: .
+          source: build/difus
           target: /home/debian/difus
       - name: Deploy Build Golang App To Debian VM
         uses: appleboy/ssh-action@master
@@ -43,8 +43,6 @@ jobs:
           key: "${{ secrets.VM_SSH_KEY }}"
           port: "${{ secrets.VM_SSH_PORT }}"
           script: |
-            cd /home/debian/difus/build
-            ls -l
-            sudo systemctl daemon-reload
-            sudo systemctl start difus
-            sudo systemctl enable difus
+            cd /home/debian/difus/
+            ./difus &
+
