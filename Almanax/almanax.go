@@ -110,7 +110,7 @@ func Run(discord *discordgo.Session) {
 	s.Start()
 
 	select {
-	case <-time.After(time.Minute):
+		case <-time.After(time.Minute):
 	}
 
 	err = s.Shutdown()
