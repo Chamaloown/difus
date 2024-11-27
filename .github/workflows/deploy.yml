@@ -1,6 +1,12 @@
 name: GitHub Actions Deploy On Vps
 run-name: ${{ github.actor }} deploy on VPS 🚀
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: 
+      - main
 
 jobs:
   build-n-deploy:

@@ -9,9 +9,25 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	almanax "github.com/chamaloown/difus/Almanax"
+	ia "github.com/chamaloown/difus/Ia"
 )
 
 var BotToken string
+
+
+func help() string {
+	return `Voici les commandes disponibles :
+
+	📜 **!author** - Affiche le nom de l'auteur.
+	❓ **!help** - Affiche ce message d'aide.
+	📅 **!alma [today | week | JJ/MM/AAAA]** - Récupère l'Almanax pour un jour spécifique :
+	      •  **today** : Affiche l'Almanax d'aujourd'hui.
+	      •  **week** : Affiche l'Almanax pour toute la semaine.
+	      •  **JJ/MM/AAAA** : Affiche l'Almanax pour une date spécifique (ex. 08/11/2024).
+	🗣️ **!ask [question]** - Pose une question technique sur dofus. (Intelligence Artificielle)
+	
+	Veuillez utiliser le bon format de date ou les mots-clés spécifiés pour chaque option.`
+}
 
 func Run() {
 	discord, err := discordgo.New("Bot " + BotToken)
@@ -47,20 +63,12 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		case strings.Contains(message.Content, "!alma"): 
 			var msg = almanax.GetAlmanax(message.Content)
 			discord.ChannelMessageSendComplex(message.ChannelID, &msg)
+		case strings.Contains(message.Content, "!ask"):
+			msg, err := ia.Lore(message.Content)
+			if err != nil {
+				log.Fatal(err)
+			}
+			discord.ChannelMessageSend(message.ChannelID, msg)
 		default:
 	}
 }
-
-func help() string {
-	return `Voici les commandes disponibles :
-
-	📜 **!author** - Affiche le nom de l'auteur.
-	❓ **!help** - Affiche ce message d'aide.
-	📅 **!alma [today | week | JJ/MM/AAAA]** - Récupère l'Almanax pour un jour spécifique :
-	      •  **today** : Affiche l'Almanax d'aujourd'hui.
-	      •  **week** : Affiche l'Almanax pour toute la semaine.
-	      •  **JJ/MM/AAAA** : Affiche l'Almanax pour une date spécifique (ex. 08/11/2024).
-	
-	Veuillez utiliser le bon format de date ou les mots-clés spécifiés pour chaque option.`
-
-	}
