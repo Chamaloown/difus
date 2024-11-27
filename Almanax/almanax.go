@@ -15,7 +15,7 @@ import (
 
 func formatAlmanax(almanax db.Almanax) string {
 	return fmt.Sprintf(
-		"📅 Almanax du **%s**\n\n🔮 **Méryde** : %s\n📈 **Type de Bonus** : %s\n🎁 **Bonus** : %s\n🎒 **Offrande** : %s x%d\n💰 **Prix estimé** : %d kamas\n",
+		"Salut les Dofusiens !\n\n📅 Almanax du **%s**\n\n🔮 **Méryde** : %s\n📈 **Type de Bonus** : %s\n🎁 **Bonus** : %s\n🎒 **Offrande** : %s x%d\n💰 **Prix estimé** : %d kamas\n",
 		almanax.Date.Format("2006/01/02"), almanax.Merydes, almanax.Type, almanax.Bonus, almanax.Offerings, almanax.QuantityOffered, almanax.Kamas)
 }
 

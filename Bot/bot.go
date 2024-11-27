@@ -24,6 +24,7 @@ func help() string {
 	      •  **today** : Affiche l'Almanax d'aujourd'hui.
 	      •  **week** : Affiche l'Almanax pour toute la semaine.
 	      •  **JJ/MM/AAAA** : Affiche l'Almanax pour une date spécifique (ex. 08/11/2024).
+	🗣️ **!ask [question]** - Pose une question technique sur dofus. (Intelligence Artificielle)
 	
 	Veuillez utiliser le bon format de date ou les mots-clés spécifiés pour chaque option.`
 }
