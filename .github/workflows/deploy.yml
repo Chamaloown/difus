@@ -38,7 +38,7 @@ jobs:
           key: "${{ secrets.VM_SSH_KEY }}"
           port: "${{ secrets.VM_SSH_PORT }}"
           source: .
-          target: /home/debian/
+          target: /home/debian/difus
       - name: Deploy Build Golang App To Debian VM
         uses: appleboy/ssh-action@master
         with:
