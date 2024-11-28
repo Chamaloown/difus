@@ -5,77 +5,72 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
-	db "github.com/chamaloown/difus/Almanax/Db"
+	formatter "github.com/chamaloown/difus/Almanax/Formatter"
+	parser "github.com/chamaloown/difus/Almanax/Parser"
+	reader "github.com/chamaloown/difus/Almanax/Reader"
+	writer "github.com/chamaloown/difus/Almanax/Writer"
+	database "github.com/chamaloown/difus/Database"
+	models "github.com/chamaloown/difus/Models"
 	gocron "github.com/go-co-op/gocron/v2"
 )
 
-func formatAlmanax(almanax db.Almanax) string {
-	return fmt.Sprintf(
-		"Salut les Dofusiens !\n\n📅 Almanax du **%s**\n\n🔮 **Méryde** : %s\n📈 **Type de Bonus** : %s\n🎁 **Bonus** : %s\n🎒 **Offrande** : %s x%d\n💰 **Prix estimé** : %d kamas\n",
-		almanax.Date.Format("2006/01/02"), almanax.Merydes, almanax.Type, almanax.Bonus, almanax.Offerings, almanax.QuantityOffered, almanax.Kamas)
-}
 
-func formatWeeklyAlmanax(almanaxes []db.Almanax) string {
-	var result string
 
-	for _, almanax := range almanaxes {
-		result += fmt.Sprintf(
-			"📅 Almanax du **%s**\n🔮 **Méryde** : %s\n📈 **Type de Bonus** : %s\n🎁 **Bonus** : %s\n🎒 **Offrande** : %s x%d\n💰 **Prix estimé** : %d kamas\n\n",
-			almanax.Date.Format("2006/01/02"), almanax.Merydes, almanax.Type, almanax.Bonus, almanax.Offerings, almanax.QuantityOffered, almanax.Kamas,
-		)
+func setup() {
+	db := database.GetDBInstance()
+
+	if reader.IsAlmanaxComplet(db) {
+		fmt.Println("Database is already set to use!")
+		return
 	}
-	return result
-}
 
-
-func GetAlmanax(message string) discordgo.MessageSend {
-	datePattern := `.*(\b\d{2}/\d{2}/\d{4}\b).*`
-	dbInstance := db.GetDBInstance()
-	re := regexp.MustCompile(datePattern)
-
-	switch {
-		case re.MatchString(message):
-			dateStr := re.FindStringSubmatch(message)
-			date, err := time.Parse("02/01/2006", dateStr[1])
-			if err != nil {
-				log.Fatal(err)
-			}
-			almanax, err := db.GetAlmanax(dbInstance, date)
-			if err != nil {
-				log.Fatal(err)
-			}
-			return discordgo.MessageSend{
-				Content: formatAlmanax(almanax),
-			}
-
-		case strings.Contains(message, "week"):
-			almanaxes, err := db.GetWeeklyAlmanax(dbInstance)
-			if err != nil {
-				log.Fatal(err)
-			}
-			return discordgo.MessageSend{
-				Content: formatWeeklyAlmanax(almanaxes),
-			}
-			
-		default:
-			almanax, err := db.GetAlmanax(dbInstance, time.Now())
-			if err != nil {
-				log.Fatal(err)
-			}
-			return discordgo.MessageSend{
-				Content: formatAlmanax(almanax),
-			}
+	records, err := parser.Run()
+	if err != nil {
+		log.Fatal(err)
 	}
-} 
+
+	for _, val := range records[1:] {
+		date, err := time.Parse("02/01/2006", val[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		qty, err := strconv.Atoi(val[5])
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		kamas, err := strconv.Atoi(val[6])
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		newEntry := models.Almanax{
+			Date:            date,
+			Merydes:         val[1],
+			Type:            val[2],
+			Bonus:           val[3],
+			Offerings:       val[4],
+			QuantityOffered: qty,
+			Kamas:           kamas,
+		}
+
+		_, err = writer.CreateAlmanax(db, newEntry)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
 
 func Run(discord *discordgo.Session) {
 	fmt.Println("Loading almanax...")
-	db.Setup()
-	fmt.Println("Almanax Loaded!")
+	setup()
+	fmt.Println("Successfully charged the database!, Almanax loaded!")
 
 	s, err := gocron.NewScheduler()
 	if err != nil {
@@ -86,19 +81,19 @@ func Run(discord *discordgo.Session) {
 		gocron.DailyJob(
 			1,
 			gocron.NewAtTimes(
-				gocron.NewAtTime(0, 30, 0),
-				gocron.NewAtTime(22, 0, 0),
+				gocron.NewAtTime(1, 30, 0),
+				gocron.NewAtTime(21, 0, 0),
 			),
 		),
 		gocron.NewTask(
 			func() {
-				pg := db.GetDBInstance()
-				alamanax, err := db.GetAlmanax(pg, time.Now().AddDate(1, 0, 0))
+				pg := database.GetDBInstance()
+				alamanax, err := reader.GetAlmanax(pg, time.Now().AddDate(1, 0, 0))
 				if err != nil {
 					log.Fatal(err)
 				}
 				var message = discordgo.MessageSend{
-					Content: formatAlmanax(alamanax),
+					Content: formatter.FormatAlmanax(alamanax),
 				}
 				discord.ChannelMessageSendComplex(os.Getenv("CHANNEL_ID"), &message)
 			},
@@ -109,12 +104,50 @@ func Run(discord *discordgo.Session) {
 	}
 	s.Start()
 
-	select {
-		case <-time.After(time.Minute):
-	}
+	<-time.After(time.Minute)
 
 	err = s.Shutdown()
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func GetAlmanax(message string) discordgo.MessageSend {
+	datePattern := `.*(\b\d{2}/\d{2}/\d{4}\b).*`
+	dbInstance := database.GetDBInstance()
+	re := regexp.MustCompile(datePattern)
+
+	switch {
+		case re.MatchString(message):
+			dateStr := re.FindStringSubmatch(message)
+			date, err := time.Parse("02/01/2006", dateStr[1])
+			if err != nil {
+				log.Fatal(err)
+			}
+			almanax, err := reader.GetAlmanax(dbInstance, date)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return discordgo.MessageSend{
+				Content: formatter.FormatAlmanax(almanax),
+			}
+
+		case strings.Contains(message, "week"):
+			almanaxes, err := reader.GetWeeklyAlmanax(dbInstance)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return discordgo.MessageSend{
+				Content: formatter.FormatWeeklyAlmanax(almanaxes),
+			}
+			
+		default:
+			almanax, err := reader.GetAlmanax(dbInstance, time.Now())
+			if err != nil {
+				log.Fatal(err)
+			}
+			return discordgo.MessageSend{
+				Content: formatter.FormatAlmanax(almanax),
+			}
 	}
 }

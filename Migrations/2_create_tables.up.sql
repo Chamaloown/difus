@@ -1,6 +1,3 @@
-
-CREATE SCHEMA IF NOT EXISTS almanax;
-
 CREATE TABLE IF NOT EXISTS almanax.almanaxes (
 	id serial primary key not null,
 	date date not null,
@@ -36,7 +33,7 @@ INSERT INTO almanax.classes (name) VALUES
 	('Huppermage'),
 	('Sacrieur'),
 	('Forgelance'),
-	('Ouginak')
+	('Ouginak');
 
 
 CREATE TABLE IF NOT EXISTS almanax.jobs (
@@ -57,13 +54,13 @@ INSERT INTO almanax.jobs (name, type) VALUES
 	('Forgeron', 'fabrication'),
 	('Tailleur', 'fabrication'),
 	('Sculteur', 'fabrication'),
-	('Façonneur' 'fabrication'),
+	('Façonneur', 'fabrication'),
 	('Cordomage', 'forgemagie'),
 	('Scultomage', 'forgemagie'),
 	('Costumage', 'forgemagie'),
 	('Façomage', 'forgemagie'),
 	('Joaillomage', 'forgemagie'),
-	('Forgemage', 'forgemagie')
+	('Forgemage', 'forgemagie');
 
 	
 
