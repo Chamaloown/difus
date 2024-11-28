@@ -16,6 +16,7 @@ var BotToken string
 
 
 func help() string {
+	fmt.Println("Help")
 	return `Voici les commandes disponibles :
 
 	📜 **!author** - Affiche le nom de l'auteur.
@@ -57,6 +58,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 
 	switch {
 		case strings.Contains(message.Content, "!author"):
+			fmt.Println("author")
 			discord.ChannelMessageSend(message.ChannelID, "Malo Landemaine")
 		case strings.Contains(message.Content, "!help"):
 			discord.ChannelMessageSend(message.ChannelID, help())

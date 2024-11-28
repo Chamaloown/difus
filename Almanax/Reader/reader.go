@@ -2,6 +2,7 @@ package reader
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
@@ -62,6 +63,7 @@ func ReadAlmanaxes(db *sql.DB) ([]models.Almanax, error) {
 
 
 func GetAlmanax(db *sql.DB, date time.Time) (models.Almanax, error) {
+	fmt.Println("Get Almanax")
 	var a models.Almanax
 	err := db.QueryRow("SELECT id, date, merydes, type, bonus, offerings, quantity_offered, kamas FROM almanax.almanaxes WHERE date = $1", date).Scan(&a.Id, &a.Date, &a.Merydes, &a.Type, &a.Bonus, &a.Offerings, &a.QuantityOffered, &a.Kamas)
 
