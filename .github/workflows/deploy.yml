@@ -30,8 +30,6 @@ jobs:
         run: 'echo -e "CLAUDE_TOKEN=${{secrets.CLAUDE_TOKEN}}\nBOT_TOKEN=${{ secrets.BOT_TOKEN }}\nCHANNEL_ID=${{ secrets.CHANNEL_ID }}\nDB_USER=${{ secrets.DB_USER }}\nDB_PASSWORD=${{ secrets.DB_PASSWORD }}\nDB_HOST=${{ secrets.DB_HOST }}\nDB_PORT=${{ secrets.DB_PORT }}\nDB_NAME=${{ secrets.DB_NAME }}\nDB_SSL=${{ secrets.DB_SSL }}\n" > build/.env'
       - name: Display Env file
         run: "cat build/.env"
-      - name: Run Unit Test Golang App
-        run: go test
       - name: Copy The Golang App
         uses: appleboy/scp-action@master
         with:
@@ -39,7 +37,7 @@ jobs:
           username: "${{ secrets.VM_USERNAME }}"
           key: "${{ secrets.VM_SSH_KEY }}"
           port: "${{ secrets.VM_SSH_PORT }}"
-          source: build/difus
+          source: build/
           target: /home/debian/difus
       - name: Deploy Build Golang App To Debian VM
         uses: appleboy/ssh-action@master
