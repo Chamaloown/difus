@@ -9,3 +9,10 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=user
       - POSTGRES_DB=difus
+  migrate:
+    image: migrate/migrate
+    volumes:
+      - .:/Migrations
+    command: ["-path", "/migrations", "-database",  "postgres://user:password@postgres:5432/difus?sslmode=disable", "up", "2"]
+    links:
+      - postgres
