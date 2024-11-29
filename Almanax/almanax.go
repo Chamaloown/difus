@@ -19,23 +19,18 @@ import (
 	gocron "github.com/go-co-op/gocron/v2"
 )
 
-
-
 func setup() {
 	db := database.GetDBInstance()
 
-	fmt.Println("Is almanax complet")
 	if reader.IsAlmanaxComplet(db) {
 		fmt.Println("Database is already set to use!")
 		return
 	}
-	
-	fmt.Println("parser Run")
+
 	records, err := parser.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("records", records)
 
 	for _, val := range records[1:] {
 		date, err := time.Parse("02/01/2006", val[0])
@@ -121,36 +116,36 @@ func GetAlmanax(message string) discordgo.MessageSend {
 	re := regexp.MustCompile(datePattern)
 
 	switch {
-		case re.MatchString(message):
-			dateStr := re.FindStringSubmatch(message)
-			date, err := time.Parse("02/01/2006", dateStr[1])
-			if err != nil {
-				log.Fatal(err)
-			}
-			almanax, err := reader.GetAlmanax(dbInstance, date)
-			if err != nil {
-				log.Fatal(err)
-			}
-			return discordgo.MessageSend{
-				Content: formatter.FormatAlmanax(almanax),
-			}
+	case re.MatchString(message):
+		dateStr := re.FindStringSubmatch(message)
+		date, err := time.Parse("02/01/2006", dateStr[1])
+		if err != nil {
+			log.Fatal(err)
+		}
+		almanax, err := reader.GetAlmanax(dbInstance, date)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return discordgo.MessageSend{
+			Content: formatter.FormatAlmanax(almanax),
+		}
 
-		case strings.Contains(message, "week"):
-			almanaxes, err := reader.GetWeeklyAlmanax(dbInstance)
-			if err != nil {
-				log.Fatal(err)
-			}
-			return discordgo.MessageSend{
-				Content: formatter.FormatWeeklyAlmanax(almanaxes),
-			}
-			
-		default:
-			almanax, err := reader.GetAlmanax(dbInstance, time.Now())
-			if err != nil {
-				log.Fatal(err)
-			}
-			return discordgo.MessageSend{
-				Content: formatter.FormatAlmanax(almanax),
-			}
+	case strings.Contains(message, "week"):
+		almanaxes, err := reader.GetWeeklyAlmanax(dbInstance)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return discordgo.MessageSend{
+			Content: formatter.FormatWeeklyAlmanax(almanaxes),
+		}
+
+	default:
+		almanax, err := reader.GetAlmanax(dbInstance, time.Now())
+		if err != nil {
+			log.Fatal(err)
+		}
+		return discordgo.MessageSend{
+			Content: formatter.FormatAlmanax(almanax),
+		}
 	}
 }

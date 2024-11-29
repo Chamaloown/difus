@@ -12,3 +12,22 @@ type Almanax struct {
 	QuantityOffered int
 	Kamas           int
 }
+
+type Job struct {
+	Id   int
+	Name string
+	Type string
+}
+
+type Class struct {
+	Id   int
+	Name string
+}
+
+type User struct {
+	Id       int
+	Name     string
+	Username string
+	Class    Class
+	Jobs     []Job
+}

@@ -10,13 +10,12 @@ import (
 	"github.com/bwmarrin/discordgo"
 	almanax "github.com/chamaloown/difus/Almanax"
 	ia "github.com/chamaloown/difus/Ia"
+	job "github.com/chamaloown/difus/Job"
 )
 
 var BotToken string
 
-
 func help() string {
-	fmt.Println("Help")
 	return `Voici les commandes disponibles :
 
 	📜 **!author** - Affiche le nom de l'auteur.
@@ -25,7 +24,8 @@ func help() string {
 	      •  **today** : Affiche l'Almanax d'aujourd'hui.
 	      •  **week** : Affiche l'Almanax pour toute la semaine.
 	      •  **JJ/MM/AAAA** : Affiche l'Almanax pour une date spécifique (ex. 08/11/2024).
-	🗣️ **!ask [question]** - Pose une question technique sur dofus. (Intelligence Artificielle)
+	🗣️ **!ask [question]** - Pose une question technique sur dofus.
+	🛠️ **!metier [metier] ?[lvl]** - Récupère tous les utilisateurs farmant ce métier, filtrer par niveau si celui-ci est renseigner.
 	
 	Veuillez utiliser le bon format de date ou les mots-clés spécifiés pour chaque option.`
 }
@@ -40,7 +40,7 @@ func Run() {
 	discord.AddHandler(newMessage)
 
 	discord.Open()
-	
+
 	go almanax.Run(discord)
 
 	defer discord.Close()
@@ -53,24 +53,29 @@ func Run() {
 
 func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	if message.Author.ID == discord.State.User.ID {
-  		return
+		return
 	}
 
 	switch {
-		case strings.Contains(message.Content, "!author"):
-			fmt.Println("author")
-			discord.ChannelMessageSend(message.ChannelID, "Malo Landemaine")
-		case strings.Contains(message.Content, "!help"):
-			discord.ChannelMessageSend(message.ChannelID, help())
-		case strings.Contains(message.Content, "!alma"): 
-			var msg = almanax.GetAlmanax(message.Content)
-			discord.ChannelMessageSendComplex(message.ChannelID, &msg)
-		case strings.Contains(message.Content, "!ask"):
-			msg, err := ia.Lore(message.Content)
-			if err != nil {
-				log.Fatal(err)
-			}
-			discord.ChannelMessageSend(message.ChannelID, msg)
-		default:
+	case strings.Contains(message.Content, "!author"):
+		discord.ChannelMessageSend(message.ChannelID, "Malo Landemaine")
+	case strings.Contains(message.Content, "!help"):
+		discord.ChannelMessageSend(message.ChannelID, help())
+	case strings.Contains(message.Content, "!alma"):
+		var msg = almanax.GetAlmanax(message.Content)
+		discord.ChannelMessageSendComplex(message.ChannelID, &msg)
+	case strings.Contains(message.Content, "!ask"):
+		msg, err := ia.Lore(message.Content)
+		if err != nil {
+			log.Fatal(err)
+		}
+		discord.ChannelMessageSend(message.ChannelID, msg)
+	case strings.Contains(message.Content, "!metier"):
+		msg, err := job.GetUsersByJob(message.Content)
+		if err != nil {
+			discord.ChannelMessageSend(message.ChannelID, err.Error())
+		}
+		discord.ChannelMessageSend(message.ChannelID, msg)
+	default:
 	}
 }

@@ -2,7 +2,6 @@ package reader
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 
@@ -12,26 +11,25 @@ import (
 const daysInAYear = 365
 
 func weekStart(year, week int) time.Time {
-    t := time.Date(year, 7, 1, 0, 0, 0, 0, time.UTC)
+	t := time.Date(year, 7, 1, 0, 0, 0, 0, time.UTC)
 
-    if wd := t.Weekday(); wd == time.Sunday {
-        t = t.AddDate(0, 0, -6)
-    } else {
-        t = t.AddDate(0, 0, -int(wd)+1)
-    }
+	if wd := t.Weekday(); wd == time.Sunday {
+		t = t.AddDate(0, 0, -6)
+	} else {
+		t = t.AddDate(0, 0, -int(wd)+1)
+	}
 
-    _, w := t.ISOWeek()
-    t = t.AddDate(0, 0, (week-w)*7)
+	_, w := t.ISOWeek()
+	t = t.AddDate(0, 0, (week-w)*7)
 
-    return t
+	return t
 }
 
 func weekRange(year, week int) (start, end time.Time) {
-    start = weekStart(year, week)
-    end = start.AddDate(0, 0, 6)
-    return
+	start = weekStart(year, week)
+	end = start.AddDate(0, 0, 6)
+	return
 }
-
 
 func IsAlmanaxComplet(db *sql.DB) bool {
 	var count int
@@ -40,7 +38,7 @@ func IsAlmanaxComplet(db *sql.DB) bool {
 		log.Printf("Error querying almanax.almanaxes: %v\n", err)
 		count = 0
 	}
-	return count == daysInAYear + 54 // + 54 because we start from 08/11/2024
+	return count == daysInAYear+54 // + 54 because we start from 08/11/2024
 }
 
 func ReadAlmanaxes(db *sql.DB) ([]models.Almanax, error) {
@@ -61,9 +59,7 @@ func ReadAlmanaxes(db *sql.DB) ([]models.Almanax, error) {
 	return almanaxes, nil
 }
 
-
 func GetAlmanax(db *sql.DB, date time.Time) (models.Almanax, error) {
-	fmt.Println("Get Almanax")
 	var a models.Almanax
 	err := db.QueryRow("SELECT id, date, merydes, type, bonus, offerings, quantity_offered, kamas FROM almanax.almanaxes WHERE date = $1", date).Scan(&a.Id, &a.Date, &a.Merydes, &a.Type, &a.Bonus, &a.Offerings, &a.QuantityOffered, &a.Kamas)
 

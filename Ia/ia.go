@@ -8,7 +8,8 @@ import (
 
 	"github.com/liushuangls/go-anthropic/v2"
 )
-func setup() (*anthropic.Client) {
+
+func setup() *anthropic.Client {
 	token := os.Getenv("CLAUDE_TOKEN")
 	client := anthropic.NewClient(token)
 	return client
