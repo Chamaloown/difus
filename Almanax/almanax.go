@@ -24,15 +24,18 @@ import (
 func setup() {
 	db := database.GetDBInstance()
 
+	fmt.Println("Is almanax complet")
 	if reader.IsAlmanaxComplet(db) {
 		fmt.Println("Database is already set to use!")
 		return
 	}
-
+	
+	fmt.Println("parser Run")
 	records, err := parser.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("records", records)
 
 	for _, val := range records[1:] {
 		date, err := time.Parse("02/01/2006", val[0])

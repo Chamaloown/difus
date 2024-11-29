@@ -13,7 +13,7 @@ services:
     image: migrate/migrate
     volumes:
       - .:/Migrations
-    command: ["-path", "/Migrations", "-database",  "postgres://user:password@postgres:5432/difus?sslmode=disable", "up", "2"]
+    command: ["-path", "/Migrations", "-database",  "postgres://user:password@postgres:5432/difus?sslmode=disable", "up", "1"]
     links:
       - postgres
 volumes:
