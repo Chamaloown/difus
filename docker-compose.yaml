@@ -16,3 +16,5 @@ services:
     command: ["-path", "/Migrations", "-database",  "postgres://user:password@postgres:5432/difus?sslmode=disable", "up", "2"]
     links:
       - postgres
+volumes:
+  pgdata:
