@@ -11,6 +11,7 @@ import (
 	almanax "github.com/chamaloown/difus/Almanax"
 	ia "github.com/chamaloown/difus/Ia"
 	job "github.com/chamaloown/difus/Job"
+	user "github.com/chamaloown/difus/User"
 )
 
 var BotToken string
@@ -56,6 +57,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		return
 	}
 
+	// User Cmd
 	switch {
 	case strings.Contains(message.Content, "!author"):
 		discord.ChannelMessageSend(message.ChannelID, "Malo Landemaine")
@@ -74,6 +76,14 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		msg, err := job.GetUsersByJob(message.Content)
 		if err != nil {
 			discord.ChannelMessageSend(message.ChannelID, err.Error())
+		}
+		discord.ChannelMessageSend(message.ChannelID, msg)
+
+	// Admin Cmd
+	case os.Getenv("ADMIN_ID") == message.Author.ID && strings.Contains(message.Content, "!useradd"):
+		msg, err := user.AddUSer(message.Content)
+		if err != nil {
+			fmt.Println(err)
 		}
 		discord.ChannelMessageSend(message.ChannelID, msg)
 	default:

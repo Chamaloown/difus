@@ -54,14 +54,10 @@ func GetUsersByJob(db *sql.DB, job string) ([]models.User, error) {
 	return users, nil
 }
 
-func GetUserByName(db *sql.DB, name string) (models.User, error) {
+func GetUserByUsername(db *sql.DB, name string) (models.User, error) {
 	var j models.User
-	err := db.QueryRow("SELECT id, name FROM almanax.users WHERE name = $1", name).Scan(&j.Id, &j.Name)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	return j, nil
+	err := db.QueryRow("SELECT id, name, username FROM almanax.users WHERE username = $1", name).Scan(&j.Id, &j.Name, &j.Username)
+	return j, err
 }
 
 func GetUsers(db *sql.DB) ([]models.User, error) {
