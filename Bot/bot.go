@@ -29,6 +29,7 @@ func help() string {
 	      •  **JJ/MM/AAAA** : Affiche l'Almanax pour une date spécifique (ex. 08/11/2024).
 	🗣️ **!ask [question]** - Pose une question technique sur dofus (Attention l'IA a comme pour dernière connaissance la mise a jour 2.62).
 	🛠️ **!metier ?[metier] ?[lvl]** - Récupère tous les métiers avec les utilisateurs inscrit à ceux-ci. On peut filtrer par métier ou filtrer par niveau si celui-ci est renseigner.
+	🚶‍♂️ **!user ** - Liste les utilisateurs enregistrés.
 
 	*COMMANDE ADMINISTRATEUR*
 
@@ -73,7 +74,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	case strings.Contains(message.Content, "!help"):
 		discord.ChannelMessageSend(message.ChannelID, help())
 	case strings.Contains(message.Content, "!alma"):
-		var msg = almanax.GetAlmanax(message.Content)
+		msg := almanax.GetAlmanax(message.Content)
 		discord.ChannelMessageSendComplex(message.ChannelID, &msg)
 	case strings.Contains(message.Content, "!ask"):
 		msg, err := ia.Lore(message.Content)
@@ -83,6 +84,12 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		discord.ChannelMessageSend(message.ChannelID, msg)
 	case strings.Contains(message.Content, "!metier"):
 		msg, err := job.GetUsersByJob(message.Content)
+		if err != nil {
+			discord.ChannelMessageSend(message.ChannelID, err.Error())
+		}
+		discord.ChannelMessageSend(message.ChannelID, msg)
+	case strings.Contains(message.Content, "!user"):
+		msg, err := user.GetUsers()
 		if err != nil {
 			discord.ChannelMessageSend(message.ChannelID, err.Error())
 		}

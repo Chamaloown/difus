@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"fmt"
 	"strings"
 
 	creader "github.com/chamaloown/difus/Class/Reader"
@@ -79,4 +80,18 @@ func AddUserJob(message string) (string, error) {
 		return "", err
 	}
 	return "L'utilisateur " + user.Username + " a correctement été lié au métier " + job.Name, nil
+}
+
+func GetUsers() (string, error) {
+	db := database.GetDBInstance()
+	users, err := ureader.GetAllUsers(db)
+	if err != nil {
+		return "", err
+	}
+	var msg string
+	for _, user := range users {
+		msg += fmt.Sprintf("**%s** : %s\n", user.Name, user.Username)
+	}
+	return msg, nil
+
 }
