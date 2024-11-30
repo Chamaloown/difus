@@ -2,7 +2,6 @@ package reader
 
 import (
 	"database/sql"
-	"fmt"
 
 	models "github.com/chamaloown/difus/Models"
 )
@@ -80,7 +79,6 @@ func GetJobWithAffiliatedUser(db *sql.DB) (map[string][]models.User, error) {
 }
 
 func GetJobByName(db *sql.DB, name string) (models.Job, error) {
-	fmt.Println("GetJobByName", name)
 	var j models.Job
 	err := db.QueryRow("SELECT id, name, type FROM almanax.jobs WHERE unaccent(upper(name)) LIKE unaccent(upper($1))", "%"+name+"%").Scan(&j.Id, &j.Name, &j.Type)
 

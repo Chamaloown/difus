@@ -2,7 +2,6 @@ package user
 
 import (
 	"database/sql"
-	"fmt"
 	"strings"
 
 	creader "github.com/chamaloown/difus/Class/Reader"
@@ -57,7 +56,6 @@ func AddUserJob(message string) (string, error) {
 	userName := strArr[1]
 	jobName := strArr[2]
 
-	fmt.Println("Je suis la")
 	job, err := jreader.GetJobByName(db, jobName)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -66,7 +64,6 @@ func AddUserJob(message string) (string, error) {
 			return "", err
 		}
 	}
-	fmt.Println("job !", job)
 
 	user, err := ureader.GetUserByUsername(db, userName)
 	if err != nil {
@@ -77,10 +74,7 @@ func AddUserJob(message string) (string, error) {
 		}
 	}
 
-	fmt.Println("user !", user)
-
 	_, err = writer.LinkUserToJob(db, user.Id, job.Id)
-	fmt.Println("ERREUR", err)
 	if err != nil {
 		return "", err
 	}
