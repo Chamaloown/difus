@@ -19,14 +19,23 @@ var BotToken string
 func help() string {
 	return `Voici les commandes disponibles :
 
-	📜 **!author** - Affiche le nom de l'auteur.
+	*COMMANDE UTILISATEUR*
+
+	📜 **!author** - Affiche le nom du dev.
 	❓ **!help** - Affiche ce message d'aide.
 	📅 **!alma [today | week | JJ/MM/AAAA]** - Récupère l'Almanax pour un jour spécifique :
 	      •  **today** : Affiche l'Almanax d'aujourd'hui.
 	      •  **week** : Affiche l'Almanax pour toute la semaine.
 	      •  **JJ/MM/AAAA** : Affiche l'Almanax pour une date spécifique (ex. 08/11/2024).
 	🗣️ **!ask [question]** - Pose une question technique sur dofus (Attention l'IA a comme pour dernière connaissance la mise a jour 2.62).
-	🛠️ **!metier [metier] ?[lvl]** - Récupère tous les utilisateurs farmant ce métier, filtrer par niveau si celui-ci est renseigner.
+	🛠️ **!metier ?[metier] ?[lvl]** - Récupère tous les métiers avec les utilisateurs inscrit à ceux-ci. On peut filtrer par métier ou filtrer par niveau si celui-ci est renseigner.
+
+	*COMMANDE ADMINISTRATEUR*
+
+	🧙🏻‍♂️ **!useradd [name] [username] [classname]** - Ajoute un utilisateur
+	🔗 **!userlink [username] [jobname]** - Ajoute un utilisateur au livre des métiers
+	❌ **!userdelete [name]** - Retire un utilisateur
+
 	
 	Veuillez utiliser le bon format de date ou les mots-clés spécifiés pour chaque option.`
 }
@@ -83,7 +92,13 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 	case os.Getenv("ADMIN_ID") == message.Author.ID && strings.Contains(message.Content, "!useradd"):
 		msg, err := user.AddUSer(message.Content)
 		if err != nil {
-			fmt.Println(err)
+			discord.ChannelMessageSend(message.ChannelID, err.Error())
+		}
+		discord.ChannelMessageSend(message.ChannelID, msg)
+	case os.Getenv("ADMIN_ID") == message.Author.ID && strings.Contains(message.Content, "!userlink"):
+		msg, err := user.AddUserJob(message.Content)
+		if err != nil {
+			discord.ChannelMessageSend(message.ChannelID, err.Error())
 		}
 		discord.ChannelMessageSend(message.ChannelID, msg)
 	default:

@@ -15,8 +15,19 @@ func CreateUser(db *sql.DB, user models.User) (int, error) {
 	`
 	err := db.QueryRow(query, user.Name, user.Username, user.Class.Id).Scan(&id)
 	if err != nil {
-		return 0, err
+		return 84, err
 	}
 	return id, nil
+}
 
+func LinkUserToJob(db *sql.DB, userId int, jobId int) (int, error) {
+	query := `
+	INSERT INTO almanax.users_jobs (user_id, job_id)
+	VALUES ($1, $2)
+	`
+	err := db.QueryRow(query, userId, jobId)
+	if err != nil {
+		return 84, err.Err()
+	}
+	return 0, nil
 }

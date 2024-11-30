@@ -1,26 +1,33 @@
 package job
 
 import (
-	"fmt"
+	"strings"
 
 	database "github.com/chamaloown/difus/Database"
 	formatter "github.com/chamaloown/difus/Job/Formatter"
-	parser "github.com/chamaloown/difus/Job/Parser"
-	uReader "github.com/chamaloown/difus/User/Reader"
+	jreader "github.com/chamaloown/difus/Job/Reader"
+	ureader "github.com/chamaloown/difus/User/Reader"
 )
 
 func GetUsersByJob(message string) (string, error) {
-	args, err := parser.Parse(message)
-	if err != nil {
-		return "", err
-	}
-	name := args[1]
 	db := database.GetDBInstance()
-	users, err := uReader.GetUsersByJob(db, name)
+	strArr := strings.Split(message, " ")
 
-	if err != nil {
-		fmt.Println(err)
+	if len(strArr) == 2 {
+		name := strArr[1]
+		users, err := ureader.GetUsersByJob(db, name)
+
+		if err != nil {
+			return "", err
+		}
+		return formatter.ListUsersByJob(users), nil
+	} else if len(strArr) == 1 {
+		jobMap, err := jreader.GetJobWithAffiliatedUser(db)
+		if err != nil {
+			return "", err
+		}
+		return formatter.ListJobsWithAssociatedUser(jobMap), nil
+	} else {
+		return "Le nombre d'argument n'est pas le bon. Consulter l'aide avec un !help", nil
 	}
-
-	return formatter.ListUsersByJob(users), nil
 }
