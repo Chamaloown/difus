@@ -88,7 +88,7 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 			discord.ChannelMessageSend(message.ChannelID, err.Error())
 		}
 		discord.ChannelMessageSend(message.ChannelID, msg)
-	case strings.Contains(message.Content, "!user"):
+	case strings.Contains(message.Content, "!users"):
 		msg, err := user.GetUsers()
 		if err != nil {
 			discord.ChannelMessageSend(message.ChannelID, err.Error())
