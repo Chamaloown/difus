@@ -38,6 +38,8 @@ And then running it :
 	      •  **JJ/MM/AAAA** : Affiche l'Almanax pour une date spécifique (ex. 08/11/2024).
 	🗣️ **!ask [question]** - Pose une question technique sur dofus (Attention l'IA a comme pour dernière connaissance la mise a jour 2.62).
 	🛠️ **!metier ?[metier] ?[lvl]** - Récupère tous les métiers avec les utilisateurs inscrit à ceux-ci. On peut filtrer par métier ou filtrer par niveau si celui-ci est renseigner.
+	🚶‍♂️ **!user ** - Liste les utilisateurs enregistrés.
+
 
 	*COMMANDE ADMINISTRATEUR*
 

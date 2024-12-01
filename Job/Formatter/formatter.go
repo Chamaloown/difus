@@ -11,7 +11,6 @@ import (
 func ListJobsWithAssociatedUser(jobsMap map[string][]models.User) string {
 	var jobList []string
 
-	// Sort job names to ensure consistent output
 	jobNames := make([]string, 0, len(jobsMap))
 	for jobName := range jobsMap {
 		jobNames = append(jobNames, jobName)

@@ -89,8 +89,9 @@ func GetUsers() (string, error) {
 		return "", err
 	}
 	var msg string
+	msg = "Liste des Utilisateurs : "
 	for _, user := range users {
-		msg += fmt.Sprintf("**%s** : %s\n", user.Name, user.Username)
+		msg += fmt.Sprintf("\n - %s -> %s", user.Username, user.Class.Name)
 	}
 	return msg, nil
 

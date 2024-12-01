@@ -71,6 +71,7 @@ func Run(discord *discordgo.Session) {
 	fmt.Println("Successfully charged the database!, Almanax loaded!")
 
 	s, err := gocron.NewScheduler()
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,12 +80,12 @@ func Run(discord *discordgo.Session) {
 		gocron.DailyJob(
 			1,
 			gocron.NewAtTimes(
-				gocron.NewAtTime(1, 30, 0),
-				gocron.NewAtTime(21, 0, 0),
+				gocron.NewAtTime(8, 0, 0),
 			),
 		),
 		gocron.NewTask(
 			func() {
+				fmt.Println("Lauching go cron !")
 				pg := database.GetDBInstance()
 				alamanax, err := reader.GetAlmanax(pg, time.Now().AddDate(1, 0, 0))
 				if err != nil {
@@ -97,6 +98,7 @@ func Run(discord *discordgo.Session) {
 			},
 		),
 	)
+
 	if err != nil {
 		log.Fatal(err)
 	}
