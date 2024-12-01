@@ -31,3 +31,12 @@ func LinkUserToJob(db *sql.DB, userId int, jobId int) (int, error) {
 	}
 	return 0, nil
 }
+
+func DeleteUser(db *sql.DB, user models.User) (int, error) {
+	err := db.QueryRow("DELETE FROM almanax.users WHERE id = $1", user.Id)
+	if err != nil {
+		return 84, err.Err()
+	}
+	return user.Id, nil
+
+}

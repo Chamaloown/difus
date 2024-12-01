@@ -29,7 +29,7 @@ func help() string {
 	      •  **JJ/MM/AAAA** : Affiche l'Almanax pour une date spécifique (ex. 08/11/2024).
 	🗣️ **!ask [question]** - Pose une question technique sur dofus (Attention l'IA a comme pour dernière connaissance la mise a jour 2.62).
 	🛠️ **!metier ?[metier] ?[lvl]** - Récupère tous les métiers avec les utilisateurs inscrit à ceux-ci. On peut filtrer par métier ou filtrer par niveau si celui-ci est renseigner.
-	🚶‍♂️ **!user ** - Liste les utilisateurs enregistrés.
+	🚶‍♂️ **!users ** - Liste les utilisateurs enregistrés.
 
 	*COMMANDE ADMINISTRATEUR*
 
@@ -104,6 +104,12 @@ func newMessage(discord *discordgo.Session, message *discordgo.MessageCreate) {
 		discord.ChannelMessageSend(message.ChannelID, msg)
 	case os.Getenv("ADMIN_ID") == message.Author.ID && strings.Contains(message.Content, "!userlink"):
 		msg, err := user.AddUserJob(message.Content)
+		if err != nil {
+			discord.ChannelMessageSend(message.ChannelID, err.Error())
+		}
+		discord.ChannelMessageSend(message.ChannelID, msg)
+	case os.Getenv("ADMIN_ID") == message.Author.ID && strings.Contains(message.Content, "!userdelete"):
+		msg, err := user.DeleteUser(message.Content)
 		if err != nil {
 			discord.ChannelMessageSend(message.ChannelID, err.Error())
 		}

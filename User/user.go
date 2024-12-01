@@ -94,5 +94,22 @@ func GetUsers() (string, error) {
 		msg += fmt.Sprintf("\n - %s -> %s", user.Username, user.Class.Name)
 	}
 	return msg, nil
+}
 
+func DeleteUser(message string) (string, error) {
+	db := database.GetDBInstance()
+	strArr := strings.Split(message, " ")
+	if len(strArr) > 2 {
+		return "Le nombre d'argument n'est pas le bon. Consulter l'aide avec un !help", nil
+	}
+	username := strArr[1]
+	user, err := ureader.GetUserByUsername(db, username)
+	if err != nil {
+		return "", err
+	}
+	_, err = writer.DeleteUser(db, user)
+	if err != nil {
+		return "", err
+	}
+	return "L'utilisateur " + user.Username + " a bien été supprimé", nil
 }
